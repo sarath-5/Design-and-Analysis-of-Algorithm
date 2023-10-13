@@ -1,0 +1,843 @@
+//mutistage
+
+
+
+import java.io.*;
+class multistage {
+    public static void main(String args[]) throws IOException {
+        BufferedReader o = new BufferedReader(new InputStreamReader(System.in));
+        int x[][] = {
+            {
+                0,1,2,3,0,0,0,0,0,0
+            },
+            {
+                0,0,0,0,4,0,0,0,0,0
+            },
+            {
+                0,0,0,0,4,3,0,0,0,0
+            },
+            {
+                0,0,0,0,2,1,0,0,0,0
+            },
+            {
+                0,0,0,0,0,0,6,7,2,0
+            },
+            {
+                0,0,0,0,0,0,4,2,3,0
+            },
+            {
+                0,0,0,0,0,0,0,0,0,1
+            },
+            {
+                0,0,0,0,0,0,0,0,0,2
+            },
+            {
+                0,0,0,0,0,0,0,0,0,3
+            },
+            {
+                0,0,0,0,0,0,0,0,0,0
+            }
+        };
+        int i, j, c, a;
+        int s[] = new int[20];
+        int p[] = new int[20];
+        int temp[] = new int[20];
+        for (i = 0; i < 10; i++) {
+            s[i] = 0;
+            temp[i] = 0;
+            p[i] = 0;
+        }
+        System.out.println("\n\nProgram for MultiStage Graph\n\n");
+        System.out.println("Select Any one Method\n");
+        System.out.println("1. Forward Method\n");
+        System.out.println("2. Backward Method\n\t");
+        a = Integer.parseInt(o.readLine());
+        switch (a) {
+            case 1:
+                for (i = 9; i >= 0; i--) {
+                    c = 0;
+                    for (j = 0; j <= 9; j++) {
+                        if (x[i][j] != 0) {
+                            if (c == 0) {
+                                s[i] = s[j] + x[i][j];
+                                p[i] = j;
+                                c = 1;
+                            } else {
+                                temp[i] = s[j] + x[i][j];
+                                if (temp[i] < s[i]) {
+                                    s[i] = s[j] + x[i][j];
+                                    p[i] = j;
+                                }
+                            }
+                        }
+                    }
+                }
+                System.out.println("\nSource  Cost  Parent");
+                for (i = 9; i >= 0; i--) {
+                    System.out.print("\n  " + i);
+                    System.out.print(" \t   " + s[i]);
+                    System.out.print(" \t   " + p[i]);
+                }
+                System.out.println("\n\n");
+                System.out.println("\n\nOptimal Path:\n\t");
+                i = p[0];
+                System.out.print("0-->" + i);
+                while (i != 9) {
+                    i = p[i];
+                    System.out.print("-->" + i);
+                }
+                break;
+            case 2:
+                for (j = 0; j <= 9; j++) {
+                    c = 0;
+                    for (i = 0; i <= 9; i++) {
+                        if (x[i][j] != 0) {
+                            if (c == 0) {
+                                s[j] = s[i] + x[i][j];
+                                p[j] = i;
+                                c = 1;
+                            } else {
+                                temp[j] = s[i] + x[i][j];
+                                if (temp[j] < s[j]) {
+                                    s[j] = s[i] + x[i][j];
+                                    p[j] = i;
+                                }
+                            }
+                        }
+                    }
+                }
+                System.out.println("\nSource  Cost   Parent");
+                for (i = 0; i <= 9; i++) {
+                    System.out.print("\n  " + i);
+                    System.out.print(" \t   " + s[i]);
+                    System.out.print(" \t   " + p[i]);
+                }
+                System.out.println("\n\n");
+                System.out.println("\n\nOptimal Path:\n\t");
+                i = p[9];
+                System.out.print("9-->" + i);
+                while (i != 0) {
+                    i = p[i];
+                    System.out.print("-->" + i);
+                }
+                break;
+        }
+    }
+}
+
+
+
+
+//kruskal
+
+
+
+import java.util.*;
+
+class kruskal {
+  class Edge implements Comparable<Edge> {
+    int src, dest, weight;
+
+    public int compareTo(Edge compareEdge) {
+      return this.weight - compareEdge.weight;
+    }
+  };
+
+  // Union
+  class subset {
+    int parent, rank;
+  };
+
+  int vertices, edges;
+  Edge edge[];
+
+  // kruskal creation
+  kruskal(int v, int e) {
+    vertices = v;
+    edges = e;
+    edge = new Edge[edges];
+    for (int i = 0; i < e; ++i)
+      edge[i] = new Edge();
+  }
+
+  int find(subset subsets[], int i) {
+    if (subsets[i].parent != i)
+      subsets[i].parent = find(subsets, subsets[i].parent);
+    return subsets[i].parent;
+  }
+
+  void Union(subset subsets[], int x, int y) {
+    int xroot = find(subsets, x);
+    int yroot = find(subsets, y);
+
+    if (subsets[xroot].rank < subsets[yroot].rank)
+      subsets[xroot].parent = yroot;
+    else if (subsets[xroot].rank > subsets[yroot].rank)
+      subsets[yroot].parent = xroot;
+    else {
+      subsets[yroot].parent = xroot;
+      subsets[xroot].rank++;
+    }
+  }
+
+  // Applying Krushkal Algorithm
+  void KruskalAlgo() {
+    Edge result[] = new Edge[vertices];
+    int e = 0;
+    int i = 0;
+    for (i = 0; i < vertices; ++i)
+      result[i] = new Edge();
+
+    // Sorting the edges
+    Arrays.sort(edge);
+    subset subsets[] = new subset[vertices];
+    for (i = 0; i < vertices; ++i)
+      subsets[i] = new subset();
+
+    for (int v = 0; v < vertices; ++v) {
+      subsets[v].parent = v;
+      subsets[v].rank = 0;
+    }
+    i = 0;
+    while (e < vertices - 1) {
+      Edge next_edge = new Edge();
+      next_edge = edge[i++];
+      int x = find(subsets, next_edge.src);
+      int y = find(subsets, next_edge.dest);
+      if (x != y) {
+        result[e++] = next_edge;
+        Union(subsets, x, y);
+      }
+    }
+    for (i = 0; i < e; ++i)
+      System.out.println(result[i].src + " - " + result[i].dest + ": " + result[i].weight);
+  }
+
+  public static void main(String[] args) {
+    int vertices = 6; // Number of vertices
+    int edges = 8; // Number of edges
+    kruskal G = new kruskal(vertices, edges);
+
+    G.edge[0].src = 0;
+    G.edge[0].dest = 1;
+    G.edge[0].weight = 4;
+
+    G.edge[1].src = 0;
+    G.edge[1].dest = 2;
+    G.edge[1].weight = 4;
+
+    G.edge[2].src = 1;
+    G.edge[2].dest = 2;
+    G.edge[2].weight = 2;
+
+    G.edge[3].src = 2;
+    G.edge[3].dest = 3;
+    G.edge[3].weight = 3;
+
+    G.edge[4].src = 2;
+    G.edge[4].dest = 5;
+    G.edge[4].weight = 2;
+
+    G.edge[5].src = 2;
+    G.edge[5].dest = 4;
+    G.edge[5].weight = 4;
+
+    G.edge[6].src = 3;
+    G.edge[6].dest = 4;
+    G.edge[6].weight = 3;
+
+    G.edge[7].src = 5;
+    G.edge[7].dest = 4;
+    G.edge[7].weight = 3;
+    G.KruskalAlgo();
+  }
+}
+
+
+//floyd
+
+class floyd {
+  final static int INF = 9999, nV = 4;
+
+  // Implementing floyd warshall algorithm
+  void floydWarshall(int graph[][]) {
+    int matrix[][] = new int[nV][nV];
+    int i, j, k;
+
+    for (i = 0; i < nV; i++)
+      for (j = 0; j < nV; j++)
+        matrix[i][j] = graph[i][j];
+
+    // Adding vertices individually
+    for (k = 0; k < nV; k++) {
+      for (i = 0; i < nV; i++) {
+        for (j = 0; j < nV; j++) {
+          if (matrix[i][k] + matrix[k][j] < matrix[i][j])
+            matrix[i][j] = matrix[i][k] + matrix[k][j];
+        }
+      }
+    }
+    printMatrix(matrix);
+  }
+
+  void printMatrix(int matrix[][]) {
+    System.out.println("the shortest path vertex is:");  
+    for (int i = 0; i < nV; ++i) {
+      for (int j = 0; j < nV; ++j) {
+        if (matrix[i][j] == INF)
+          System.out.print("INF ");
+        else
+          System.out.print(matrix[i][j] + "  ");
+      }
+      System.out.println();
+    }
+  }
+
+  public static void main(String[] args) {
+    int graph[][] = { { 0, 3, INF, 5 }, { 2, 0, INF, 4 }, { INF, 1, 0, INF }, { INF, INF, 2, 0 } };
+    floyd a = new floyd();
+    a.floydWarshall(graph);
+  }
+}
+
+
+
+//TSP-dynamic
+
+import java.util.Arrays;
+
+public class travelling {
+    private int[][] distance;
+    private int numberOfCities;
+    private int[][] memo;
+
+    public travelling(int[][] distance) {
+        this.distance = distance;
+        this.numberOfCities = distance.length;
+        this.memo = new int[numberOfCities][(int) Math.pow(2, numberOfCities)];
+    }
+
+    public int tsp(int startCity, int visitedCities) {
+        if (visitedCities == (1 << numberOfCities) - 1) {
+            return distance[startCity][0];
+        }
+        if (memo[startCity][visitedCities] != 0) {
+            return memo[startCity][visitedCities];
+        }
+        int minCost = Integer.MAX_VALUE;
+        for (int nextCity = 0; nextCity < numberOfCities; nextCity++) {
+            if ((visitedCities & (1 << nextCity)) == 0) {
+                int currentCost = distance[startCity][nextCity] + tsp(nextCity, visitedCities | (1 << nextCity));
+                minCost = Math.min(minCost, currentCost);
+            }
+        }
+        memo[startCity][visitedCities] = minCost;
+        return minCost;
+    }
+
+    public static void main(String[] args) {
+        int[][] distance = {
+            {0, 10, 15, 20},
+            {10, 0, 35, 25},
+            {15, 35, 0, 30},
+            {20, 25, 30, 0}
+        };
+        travelling tsp = new travelling(distance);
+        int startCity = 0;
+        int visitedCities = 1 << startCity;
+        int minCost = tsp.tsp(startCity, visitedCities);
+        System.out.println("Minimum cost: " + minCost);
+    }
+}
+
+
+
+
+//8-queens
+
+
+public class nqueen {
+	final int N = 8;
+
+	/* A utility function to print solution */
+	void printSolution(int board[][])
+	{
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < N; j++)
+				System.out.print(" " + board[i][j]
+								+ " ");
+			System.out.println();
+		}
+	}
+
+	/* A utility function to check if a queen can
+	be placed on board[row][col]. Note that this
+	function is called when "col" queens are already
+	placed in columns from 0 to col -1. So we need
+	to check only left side for attacking queens */
+	boolean isSafe(int board[][], int row, int col)
+	{
+		int i, j;
+
+		/* Check this row on left side */
+		for (i = 0; i < col; i++)
+			if (board[row][i] == 1)
+				return false;
+
+		/* Check upper diagonal on left side */
+		for (i = row, j = col; i >= 0 && j >= 0; i--, j--)
+			if (board[i][j] == 1)
+				return false;
+
+		/* Check lower diagonal on left side */
+		for (i = row, j = col; j >= 0 && i < N; i++, j--)
+			if (board[i][j] == 1)
+				return false;
+
+		return true;
+	}
+
+	/* A recursive utility function to solve N
+	Queen problem */
+	boolean solveNQUtil(int board[][], int col)
+	{
+		/* base case: If all queens are placed
+		then return true */
+		if (col >= N)
+			return true;
+
+		/* Consider this column and try placing
+		this queen in all rows one by one */
+		for (int i = 0; i < N; i++) {
+			/* Check if the queen can be placed on
+			board[i][col] */
+			if (isSafe(board, i, col)) {
+				/* Place this queen in board[i][col] */
+				board[i][col] = 1;
+
+				/* recur to place rest of the queens */
+				if (solveNQUtil(board, col + 1) == true)
+					return true;
+
+				/* If placing queen in board[i][col]
+				doesn't lead to a solution then
+				remove queen from board[i][col] */
+				board[i][col] = 0; // BACKTRACK
+			}
+		}
+
+		/* If the queen can not be placed in any row in
+		this column col, then return false */
+		return false;
+	}
+
+	/* This function solves the N Queen problem using
+	Backtracking. It mainly uses solveNQUtil () to
+	solve the problem. It returns false if queens
+	cannot be placed, otherwise, return true and
+	prints placement of queens in the form of 1s.
+	Please note that there may be more than one
+	solutions, this function prints one of the
+	feasible solutions.*/
+	boolean solveNQ()
+	{
+		int board[][] = { { 0, 0, 0, 0 ,0, 0, 0, 0},
+						{ 0, 0, 0, 0,0, 0, 0, 0 },
+						{ 0, 0, 0, 0, 0, 0, 0, 0},
+						{ 0, 0, 0, 0, 0, 0, 0, 0 }, 
+                        { 0, 0, 0, 0 ,0, 0, 0, 0},
+						{ 0, 0, 0, 0,0, 0, 0, 0 },
+						{ 0, 0, 0, 0, 0, 0, 0, 0},
+						{ 0, 0, 0, 0, 0, 0, 0, 0 }};
+
+		if (solveNQUtil(board, 0) == false) {
+			System.out.print("Solution does not exist");
+			return false;
+		}
+
+		printSolution(board);
+		return true;
+	}
+
+	// driver program to test above function
+	public static void main(String args[])
+	{
+		nqueen Queen = new nqueen();
+		Queen.solveNQ();
+	}
+}
+
+
+
+//hamiltonian cycle
+
+
+
+class hamiltoniancycle
+{
+    final int V = 5;
+    int path[];
+ 
+    /* A utility function to check if the vertex v can be
+       added at index 'pos'in the Hamiltonian Cycle
+       constructed so far (stored in 'path[]') */
+    boolean isSafe(int v, int graph[][], int path[], int pos)
+    {
+        /* Check if this vertex is an adjacent vertex of
+           the previously added vertex. */
+        if (graph[path[pos - 1]][v] == 0)
+            return false;
+ 
+        /* Check if the vertex has already been included.
+           This step can be optimized by creating an array
+           of size V */
+        for (int i = 0; i < pos; i++)
+            if (path[i] == v)
+                return false;
+ 
+        return true;
+    }
+ 
+    /* A recursive utility function to solve hamiltonian
+       cycle problem */
+    boolean hamCycleUtil(int graph[][], int path[], int pos)
+    {
+        /* base case: If all vertices are included in
+           Hamiltonian Cycle */
+        if (pos == V)
+        {
+            // And if there is an edge from the last included
+            // vertex to the first vertex
+            if (graph[path[pos - 1]][path[0]] == 1)
+                return true;
+            else
+                return false;
+        }
+ 
+        // Try different vertices as a next candidate in
+        // Hamiltonian Cycle. We don't try for 0 as we
+        // included 0 as starting point in hamCycle()
+        for (int v = 1; v < V; v++)
+        {
+            /* Check if this vertex can be added to Hamiltonian
+               Cycle */
+            if (isSafe(v, graph, path, pos))
+            {
+                path[pos] = v;
+ 
+                /* recur to construct rest of the path */
+                if (hamCycleUtil(graph, path, pos + 1) == true)
+                    return true;
+ 
+                /* If adding vertex v doesn't lead to a solution,
+                   then remove it */
+                path[pos] = -1;
+            }
+        }
+ 
+        /* If no vertex can be added to Hamiltonian Cycle
+           constructed so far, then return false */
+        return false;
+    }
+ 
+    /* This function solves the Hamiltonian Cycle problem using
+       Backtracking. It mainly uses hamCycleUtil() to solve the
+       problem. It returns false if there is no Hamiltonian Cycle
+       possible, otherwise return true and prints the path.
+       Please note that there may be more than one solutions,
+       this function prints one of the feasible solutions. */
+    int hamCycle(int graph[][])
+    {
+        path = new int[V];
+        for (int i = 0; i < V; i++)
+            path[i] = -1;
+ 
+        /* Let us put vertex 0 as the first vertex in the path.
+           If there is a Hamiltonian Cycle, then the path can be
+           started from any point of the cycle as the graph is
+           undirected */
+        path[0] = 0;
+        if (hamCycleUtil(graph, path, 1) == false)
+        {
+            System.out.println("\nSolution does not exist");
+            return 0;
+        }
+ 
+        printSolution(path);
+        return 1;
+    }
+ 
+    /* A utility function to print solution */
+    void printSolution(int path[])
+    {
+        System.out.println("Solution Exists: Following" +
+                           " is one Hamiltonian Cycle");
+        for (int i = 0; i < V; i++)
+            System.out.print(" " + path[i] + " ");
+ 
+        // Let us print the first vertex again to show the
+        // complete cycle
+        System.out.println(" " + path[0] + " ");
+    }
+ 
+    // driver program to test above function
+    public static void main(String args[])
+    {
+        hamiltoniancycle hamiltonian =
+                                new hamiltoniancycle();
+        /* Let us create the following graph
+           (0)--(1)--(2)
+            |   / \   |
+            |  /   \  |
+            | /     \ |
+           (3)-------(4)    */
+        int graph1[][] = {{0, 1, 0, 1, 0},
+            {1, 0, 1, 1, 1},
+            {0, 1, 0, 0, 1},
+            {1, 1, 0, 0, 1},
+            {0, 1, 1, 1, 0},
+        };
+ 
+        // Print the solution
+        hamiltonian.hamCycle(graph1);
+ 
+        
+    }
+}
+
+//TSP Branch bound
+
+
+import java.util.*;
+
+class TSPbranch
+{
+	
+	static int N = 4;
+
+	// final_path[] stores the final solution ie, the
+	// path of the salesman.
+	static int final_path[] = new int[N + 1];
+
+	// visited[] keeps track of the already visited nodes
+	// in a particular path
+	static boolean visited[] = new boolean[N];
+
+	// Stores the final minimum weight of shortest tour.
+	static int final_res = Integer.MAX_VALUE;
+
+	// Function to copy temporary solution to
+	// the final solution
+	static void copyToFinal(int curr_path[])
+	{
+		for (int i = 0; i < N; i++)
+			final_path[i] = curr_path[i];
+		final_path[N] = curr_path[0];
+	}
+
+	// Function to find the minimum edge cost
+	// having an end at the vertex i
+	static int firstMin(int adj[][], int i)
+	{
+		int min = Integer.MAX_VALUE;
+		for (int k = 0; k < N; k++)
+			if (adj[i][k] < min && i != k)
+				min = adj[i][k];
+		return min;
+	}
+
+	// function to find the second minimum edge cost
+	// having an end at the vertex i
+	static int secondMin(int adj[][], int i)
+	{
+		int first = Integer.MAX_VALUE, second = Integer.MAX_VALUE;
+		for (int j=0; j<N; j++)
+		{
+			if (i == j)
+				continue;
+
+			if (adj[i][j] <= first)
+			{
+				second = first;
+				first = adj[i][j];
+			}
+			else if (adj[i][j] <= second &&
+					adj[i][j] != first)
+				second = adj[i][j];
+		}
+		return second;
+	}
+
+	// function that takes as arguments:
+	// curr_bound -> lower bound of the root node
+	// curr_weight-> stores the weight of the path so far
+	// level-> current level while moving in the search
+	//		 space tree
+	// curr_path[] -> where the solution is being stored which
+	//			 would later be copied to final_path[]
+	static void TSPRec(int adj[][], int curr_bound, int curr_weight,
+				int level, int curr_path[])
+	{
+		// base case is when we have reached level N which
+		// means we have covered all the nodes once
+		if (level == N)
+		{
+			// check if there is an edge from last vertex in
+			// path back to the first vertex
+			if (adj[curr_path[level - 1]][curr_path[0]] != 0)
+			{
+				// curr_res has the total weight of the
+				// solution we got
+				int curr_res = curr_weight +
+						adj[curr_path[level-1]][curr_path[0]];
+	
+				// Update final result and final path if
+				// current result is better.
+				if (curr_res < final_res)
+				{
+					copyToFinal(curr_path);
+					final_res = curr_res;
+				}
+			}
+			return;
+		}
+
+		// for any other level iterate for all vertices to
+		// build the search space tree recursively
+		for (int i = 0; i < N; i++)
+		{
+			// Consider next vertex if it is not same (diagonal
+			// entry in adjacency matrix and not visited
+			// already)
+			if (adj[curr_path[level-1]][i] != 0 &&
+					visited[i] == false)
+			{
+				int temp = curr_bound;
+				curr_weight += adj[curr_path[level - 1]][i];
+
+				// different computation of curr_bound for
+				// level 2 from the other levels
+				if (level==1)
+				curr_bound -= ((firstMin(adj, curr_path[level - 1]) +
+								firstMin(adj, i))/2);
+				else
+				curr_bound -= ((secondMin(adj, curr_path[level - 1]) +
+								firstMin(adj, i))/2);
+
+				// curr_bound + curr_weight is the actual lower bound
+				// for the node that we have arrived on
+				// If current lower bound < final_res, we need to explore
+				// the node further
+				if (curr_bound + curr_weight < final_res)
+				{
+					curr_path[level] = i;
+					visited[i] = true;
+
+					// call TSPRec for the next level
+					TSPRec(adj, curr_bound, curr_weight, level + 1,
+						curr_path);
+				}
+
+				// Else we have to prune the node by resetting
+				// all changes to curr_weight and curr_bound
+				curr_weight -= adj[curr_path[level-1]][i];
+				curr_bound = temp;
+
+				// Also reset the visited array
+				Arrays.fill(visited,false);
+				for (int j = 0; j <= level - 1; j++)
+					visited[curr_path[j]] = true;
+			}
+		}
+	}
+
+	// This function sets up final_path[]
+	static void TSP(int adj[][])
+	{
+		int curr_path[] = new int[N + 1];
+
+		// Calculate initial lower bound for the root node
+		// using the formula 1/2 * (sum of first min +
+		// second min) for all edges.
+		// Also initialize the curr_path and visited array
+		int curr_bound = 0;
+		Arrays.fill(curr_path, -1);
+		Arrays.fill(visited, false);
+
+		// Compute initial bound
+		for (int i = 0; i < N; i++)
+			curr_bound += (firstMin(adj, i) +
+						secondMin(adj, i));
+
+		// Rounding off the lower bound to an integer
+		curr_bound = (curr_bound==1)? curr_bound/2 + 1 :
+									curr_bound/2;
+
+		// We start at vertex 1 so the first vertex
+		// in curr_path[] is 0
+		visited[0] = true;
+		curr_path[0] = 0;
+
+		// Call to TSPRec for curr_weight equal to
+		// 0 and level 1
+		TSPRec(adj, curr_bound, 0, 1, curr_path);
+	}
+	
+	// Driver code
+	public static void main(String[] args)
+	{
+		//Adjacency matrix for the given graph
+		int adj[][] = {{0, 10, 15, 20},
+						{10, 0, 35, 25},
+						{15, 35, 0, 30},
+						{20, 25, 30, 0} };
+
+		TSP(adj);
+
+		System.out.printf("Minimum cost : %d\n", final_res);
+		System.out.printf("Path Taken : ");
+		for (int i = 0; i <= N; i++)
+		{
+			System.out.printf("%d ", final_path[i]);
+		}
+	}
+}
+
+
+//0/1 knapsack-dynamic
+
+
+
+import java.util.*;
+ 
+class knapsackdp {
+    static int knapSack(int W, int wt[], int val[], int n)
+    {
+        // Making and initializing dp array
+        int[] dp = new int[W + 1];
+ 
+        for (int i = 1; i < n + 1; i++) {
+            for (int w = W; w >= 0; w--) {
+ 
+                if (wt[i - 1] <= w)
+ 
+                    // Finding the maximum value
+                    dp[w]
+                        = Math.max(dp[w], dp[w - wt[i - 1]]
+                                              + val[i - 1]);
+            }
+        }
+        // Returning the maximum value of knapsack
+        return dp[W];
+    }
+ 
+    // Driver code
+    public static void main(String[] args)
+    {
+        int profit[] = { 60, 100, 120 };
+        int weight[] = { 10, 20, 30 };
+        int W = 50;
+        int n = profit.length;
+        System.out.print(knapSack(W, weight, profit, n));
+    }
+}
